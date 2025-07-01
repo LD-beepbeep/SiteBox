@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Site Box</title>
+<style>
+  /* CSS Variables */
+  :root {
+    --color-light-bg: #fff;
+    --color-light-text: #111;
+    --color-light-border: #ccc;
+    --color-light-accent: #222;
+    --color-dark-bg: #111;
+    --color-dark-text: #eee;
+    --color-dark-border: #444;
+    --color-dark-accent: #ddd;
+    --accent-white: #fefefe;
+    --accent-black: #121212;
+    --category-colors: #e63946, #f1faee, #a8dadc, #457b9d, #1d3557, #ffb703, #fb8500;
+  }
+
+  /* Reset & base */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--color-light-bg);
+    color: var(--color-light-text);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.35s ease, color 0.35s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  body.dark-mode {
+    background-color: var(--color-dark-bg);
+    color: var(--color-dark-text);
+  }
+  h1, h2 {
+    margin: 0 0 0.4rem 0;
+    font-weight: 600;
+  }
+  h1 {
+    font-size: 1.6rem;
+  }
+  h2 {
+    font-size: 1.25rem;
+  }
+  button {
+    all: unset;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 9999px;
+    padding: 0.45rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,0.05);
+    color: inherit;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  body.dark-mode button {
+    background-color: rgba(255,255,255,0.1);
+  }
+  button:hover, button:focus-visible {
+    background-color: var(--color-light-accent);
+    color: var(--accent-white);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.15);
+  }
+  body.dark-mode button:hover, body.dark-mode button:focus-visible {
+    background-color: var(--color-dark-accent);
+    color: var(--accent-black);
+    box-shadow: 0 4px 10px rgb(255 255 255 / 0.15);
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-light-border);
+    background-color: inherit;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    user-select: none;
+  }
+  body.dark-mode header {
+    border-color: var(--color-dark-border);
+  }
+  header h1 {
+    font-weight: 700;
+    font-size: 1.7rem;
+  }
+  header .button-group {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.5rem 1rem 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-light-border);
+    background-color: inherit;
+  }
+  body.dark-mode .tabs {
+    border-color: var(--color-dark-border);
+  }
+  .tab {
+    position: relative;
+    padding: 0.4rem 1.2rem 0.4rem 2rem;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 9999px;
+    font-weight: 500;
+    white-space: nowrap;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    user-select: none;
+  }
+  body.dark-mode .tab {
+    background-color: rgba(255,255,255,0.1);
+  }
+  .tab:hover, .tab:focus-visible {
+    background-color: var(--color-light-accent);
+    color: var(--accent-white);
+  }
+  body.dark-mode .tab:hover, body.dark-mode .tab:focus-visible {
+    background-color: var(--color-dark-accent);
+    color: var(--accent-black);
+  }
+  .tab.active {
+    font-weight: 700;
+    background-color: var(--color-light-accent);
+    color: var(--accent-white);
+  }
+  body.dark-mode .tab.active {
+    background-color: var(--color-dark-accent);
+    color: var(--accent-black);
+  }
+  .tab .dot {
+    position: absolute;
+    left: 0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* APP GRID */
+  #appGrid {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    padding: 1rem 1rem 2rem;
+    user-select: none;
+  }
+
+  /* CARD */
+  .card {
+    background-color: inherit;
+    border: 1.5px solid var(--color-light-border);
+    border-radius: 1rem;
+    padding: 1rem 1rem 0.8rem 1rem;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.04);
+    transition:
+      transform 0.25s cubic-bezier(0.4,0,0.2,1),
+      box-shadow 0.25s cubic-bezier(0.4,0,0.2,1),
+      border-color 0.25s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  body.dark-mode .card {
+    border-color: var(--color-dark-border);
+    box-shadow: 0 1px 6px rgb(255 255 255 / 0.06);
+  }
+  .card:hover, .card:focus-visible {
+    transform: scale(1.04);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.1);
+    border-color: var(--color-light-accent);
+  }
+  body.dark-mode .card:hover, body.dark-mode .card:focus-visible {
+    box-shadow: 0 8px 20px rgb(255 255 255 / 0.15);
+    border-color: var(--color-dark-accent);
+  }
+  .card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    border-radius: 0.8rem;
+    user-select: none;
+    pointer-events: none;
+  }
+  .card .title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card .favorite {
+    font-size: 1.25rem;
+    align-self: flex-end;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.3s ease;
+    color: #aaa;
+  }
+  .card .favorite.favorited {
+    color: #f5a623;
+    filter: drop-shadow(0 0 1px #f5a623);
+  }
+  .card .favorite:hover {
+    color: #ffcb6b;
+  }
+
+  /* FORM */
+  #addForm {
+    max-width: 480px;
+    margin: 1rem auto 3rem;
+    background-color: inherit;
+    border: 1px solid var(--color-light-border);
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
+    transition: background-color 0.35s ease, border-color 0.35s ease;
+    user-select: none;
+  }
+  body.dark-mode #addForm {
+    border-color: var(--color-dark-border);
+    box-shadow: 0 2px 10px rgb(255 255 255 / 0.06);
+  }
+  #addForm input[type="text"],
+  #addForm textarea,
+  #addForm input[type="file"] {
+    width: 100%;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 0.6rem;
+    border: 1.5px solid var(--color-light-border);
+    background-color: inherit;
+    color: inherit;
+    transition: border-color 0.25s ease;
+    font-family: inherit;
+  }
+  #addForm input[type="file"] {
+    padding: 0.3rem 0.75rem;
+  }
+  body.dark-mode #addForm input[type="text"],
+  body.dark-mode #addForm textarea,
+  body.dark-mode #addForm input[type="file"] {
+    border-color: var(--color-dark-border);
+  }
+  #addForm input[type="text"]:focus,
+  #addForm textarea:focus,
+  #addForm input[type="file"]:focus {
+    outline: none;
+    border-color: var(--color-light-accent);
+    box-shadow: 0 0 8px var(--color-light-accent);
+  }
+  body.dark-mode #addForm input[type="text"]:focus,
+  body.dark-mode #addForm textarea:focus,
+  body.dark-mode #addForm input[type="file"]:focus {
+    border-color: var(--color-dark-accent);
+    box-shadow: 0 0 10px var(--color-dark-accent);
+  }
+  #addForm textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: monospace;
+  }
+  #addForm .buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  #addForm .buttons button {
+    min-width: 80px;
+  }
+  #addForm .preview {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  #addForm .preview img {
+    max-height: 48px;
+    max-width: 48px;
+    border-radius: 0.75rem;
+    object-fit: contain;
+  }
+  #addForm .preview .file-name {
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  /* FULLSCREEN OVERLAY */
+  #fullscreen {
+    position: fixed;
+    inset: 0;
+    background-color: var(--color-light-bg);
+    color: var(--color-light-text);
+    display: none;
+    flex-direction: column;
+    z-index: 10000;
+  }
+  body.dark-mode #fullscreen {
+    background-color: var(--color-dark-bg);
+    color: var(--color-dark-text);
+  }
+  #fullscreen iframe {
+    flex-grow: 1;
+    border: none;
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+  }
+  #fullscreen-close-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10001;
+    background-color: rgba(0,0,0,0.15);
+    color: var(--accent-white);
+    font-size: 1.3rem;
+    padding: 0.2rem 0.8rem;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.15s ease;
+    user-select: none;
+    cursor: pointer;
+  }
+  body.dark-mode #fullscreen-close-btn {
+    background-color: rgba(255,255,255,0.15);
+    color: var(--accent-black);
+    box-shadow: 0 0 12px rgba(255,255,255,0.2);
+  }
+  #fullscreen-close-btn:hover,
+  #fullscreen-close-btn:focus-visible {
+    background-color: var(--color-light-accent);
+    color: var(--accent-white);
+    transform: scale(1.1);
+    box-shadow: 0 0 12px var(--color-light-accent);
+  }
+  body.dark-mode #fullscreen-close-btn:hover,
+  body.dark-mode #fullscreen-close-btn:focus-visible {
+    background-color: var(--color-dark-accent);
+    color: var(--accent-black);
+    box-shadow: 0 0 14px var(--color-dark-accent);
+  }
+
+  /* PROFILE CARD (optional) */
+  #profileCard {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background-color: var(--color-light-bg);
+    color: var(--color-light-text);
+    border-radius: 1rem;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+    padding: 0.75rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0.9;
+    user-select: none;
+    cursor: default;
+    transition: opacity 0.35s ease;
+  }
+  body.dark-mode #profileCard {
+    background-color: var(--color-dark-bg);
+    color: var(--color-dark-text);
+    box-shadow: 0 3px 8px rgb(255 255 255 / 0.12);
+  }
+  #profileCard:hover {
+    opacity: 1;
+  }
+
+  /* Responsive */
+  @media (max-width: 520px) {
+    #appGrid {
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      padding: 0.5rem 0.75rem 1rem;
+      gap: 0.75rem;
+    }
+    #addForm {
+      margin: 1rem 0.75rem 3rem;
+      padding: 1rem 1rem 1rem;
+    }
+    header h1 {
+      font-size: 1.4rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📱 Site Box</h1>
+  <div class="button-group" role="group" aria-label="Header Controls">
+    <button id="addAppBtn" aria-haspopup="dialog" aria-controls="addForm" title="Add New App">➕ Add</button>
+    <button id="darkModeToggle" aria-pressed="false" title="Toggle Dark Mode">🌓 Mode</button>
+    <button id="viewSourceBtn" title="Open Source Code Extractor">👀 Source</button>
+  </div>
+</header>
+
+<div class="tabs" id="categoryTabs" role="tablist" aria-label="App Categories"></div>
+
+<div id="appGrid" class="grid" role="list" aria-live="polite" aria-relevant="additions removals"></div>
+
+<!-- Add App Form -->
+<section id="addForm" class="form-section" role="dialog" aria-modal="true" aria-labelledby="addFormTitle" hidden>
+  <h2 id="addFormTitle">Add New App</h2>
+  <form id="appForm" novalidate autocomplete="off">
+    <label for="appTitleInput">App Title *</label>
+    <input id="appTitleInput" name="title" type="text" placeholder="App Title" required minlength="2" maxlength="50" aria-describedby="titleHelp" />
+    <div id="titleHelp" class="helper-text">2-∞ characters</div>
+
+    <label for="appHTMLInput">HTML Code *</label>
+    <textarea id="appHTMLInput" name="html" placeholder="Paste or upload HTML code" required aria-describedby="htmlHelp"></textarea>
+    <div id="htmlHelp" class="helper-text">Paste your HTML or upload an HTML file</div>
+
+    <label for="appHTMLUpload">Upload HTML File</label>
+    <input id="appHTMLUpload" type="file" accept=".html,text/html" aria-describedby="htmlUploadHelp" />
+    <div id="htmlUploadHelp" class="helper-text">Select an HTML file to load its content</div>
+
+    <label for="appCategoryInput">Category</label>
+    <input id="appCategoryInput" name="category" type="text" placeholder="Category (e.g., Games)" maxlength="30" aria-describedby="categoryHelp" />
+    <div id="categoryHelp" class="helper-text">Optional</div>
+
+    <label for="appIconUpload">Upload Icon (image)</label>
+    <input id="appIconUpload" type="file" accept="image/*" aria-describedby="iconUploadHelp" />
+    <div id="iconUploadHelp" class="helper-text">Optional - PNG, JPG, SVG recommended</div>
+
+    <div class="preview" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="buttons">
+      <button type="submit" id="saveAppBtn">Save</button>
+      <button type="button" id="cancelAppBtn">Cancel</button>
+    </div>
+  </form>
+</section>
+
+<!-- Fullscreen Overlay -->
+<div id="fullscreen" aria-modal="true" role="dialog" aria-label="App View">
+  <button id="fullscreen-close-btn" aria-label="Close App View">×</button>
+  <iframe id="appFrame" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+</div>
+
+<!-- Optional Profile Card -->
+<div id="profileCard" role="contentinfo" aria-label="User profile">User: Guest</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // === Data ===
+  let apps = JSON.parse(localStorage.getItem('appsData') || '[]');
+  let favorites = JSON.parse(localStorage.getItem('favoritesData') || '[]');
+
+  // === DOM refs ===
+  const appGrid = document.getElementById('appGrid');
+  const categoryTabs = document.getElementById('categoryTabs');
+  const addAppBtn = document.getElementById('addAppBtn');
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  const viewSourceBtn = document.getElementById('viewSourceBtn');
+
+  const addForm = document.getElementById('addForm');
+  const appForm = document.getElementById('appForm');
+  const appTitleInput = document.getElementById('appTitleInput');
+  const appHTMLInput = document.getElementById('appHTMLInput');
+  const appHTMLUpload = document.getElementById('appHTMLUpload');
+  const appCategoryInput = document.getElementById('appCategoryInput');
+  const appIconUpload = document.getElementById('appIconUpload');
+  const previewContainer = addForm.querySelector('.preview');
+  const cancelAppBtn = document.getElementById('cancelAppBtn');
+
+  const fullscreen = document.getElementById('fullscreen');
+  const fullscreenCloseBtn = document.getElementById('fullscreen-close-btn');
+  const appFrame = document.getElementById('appFrame');
+
+  // === State ===
+  let currentCategory = 'All';
+  let isDarkMode = false;
+
+  // === Utilities ===
+  const escapeHTML = str => str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const getCategoryColors = () => [
+    '#e63946', '#f1faee', '#a8dadc', '#457b9d', '#1d3557', '#ffb703', '#fb8500'
+  ];
+
+  const getCategoryColor = (cat, categories) => {
+    const index = categories.indexOf(cat);
+    if (index === -1) return '#777';
+    const colors = getCategoryColors();
+    return colors[index % colors.length];
+  };
+
+  // === Persistence ===
+  const saveApps = () => {
+    localStorage.setItem('appsData', JSON.stringify(apps));
+  };
+  const saveFavorites = () => {
+    localStorage.setItem('favoritesData', JSON.stringify(favorites));
+  };
+
+  // === Rendering ===
+  function renderTabs() {
+    const categories = ['All', ...Array.from(new Set(apps.map(a => a.category).filter(Boolean)))];
+    categoryTabs.innerHTML = '';
+    categories.forEach((cat, i) => {
+      const tab = document.createElement('button');
+      tab.className = 'tab';
+      tab.role = 'tab';
+      tab.id = `tab-${cat.toLowerCase()}`;
+      tab.setAttribute('aria-selected', cat === currentCategory ? 'true' : 'false');
+      tab.textContent = cat;
+      tab.style.setProperty('--dot-color', getCategoryColor(cat, categories));
+      tab.innerHTML = `<span class="dot" style="background-color:${getCategoryColor(cat, categories)}"></span>${escapeHTML(cat)}`;
+      if (cat === currentCategory) tab.classList.add('active');
+      tab.addEventListener('click', () => {
+        currentCategory = cat;
+        renderTabs();
+        renderApps();
+      });
+      categoryTabs.appendChild(tab);
+    });
+  }
+
+  function renderApps() {
+    appGrid.innerHTML = '';
+    let filteredApps = apps;
+    if (currentCategory !== 'All') {
+      filteredApps = apps.filter(a => a.category === currentCategory);
+    }
+    if (filteredApps.length === 0) {
+      const emptyMsg = document.createElement('p');
+      emptyMsg.textContent = 'No apps to show in this category.';
+      emptyMsg.style.fontStyle = 'italic';
+      emptyMsg.style.textAlign = 'center';
+      emptyMsg.style.gridColumn = '1 / -1';
+      appGrid.appendChild(emptyMsg);
+      return;
+    }
+    filteredApps.forEach((app, idx) => {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.tabIndex = 0;
+      card.setAttribute('role', 'listitem');
+      card.setAttribute('aria-label', `Open ${app.title} app`);
+
+      const iconURL = app.icon ? app.icon : 'data:image/svg+xml;base64,' + btoa(`<svg fill="none" stroke="${getCategoryColor(app.category || 'Other', ['Other'])}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" height="64" width="64" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/></svg>`);
+      const img = document.createElement('img');
+      img.src = iconURL;
+      img.alt = app.title + ' icon';
+      img.loading = 'lazy';
+
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = app.title;
+
+      const favBtn = document.createElement('span');
+      favBtn.className = 'favorite';
+      favBtn.setAttribute('role', 'button');
+      favBtn.setAttribute('aria-label', favorites.includes(app.id) ? 'Remove from favorites' : 'Add to favorites');
+      favBtn.tabIndex = 0;
+      favBtn.innerHTML = favorites.includes(app.id) ? '★' : '☆';
+      if (favorites.includes(app.id)) favBtn.classList.add('favorited');
+
+      // Toggle favorite
+      favBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (favorites.includes(app.id)) {
+          favorites = favorites.filter(f => f !== app.id);
+        } else {
+          favorites.push(app.id);
+        }
+        saveFavorites();
+        renderApps();
+      });
+      favBtn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          favBtn.click();
+        }
+      });
+
+      card.appendChild(img);
+      card.appendChild(title);
+      card.appendChild(favBtn);
+
+      // Open app on click or Enter key
+      card.addEventListener('click', () => openApp(app));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openApp(app);
+        }
+      });
+
+      appGrid.appendChild(card);
+    });
+  }
+
+  // === Open app in fullscreen iframe ===
+  function openApp(app) {
+    // Using blob for sandboxed iframe with inline HTML
+    const blob = new Blob([app.html], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    appFrame.src = url;
+    fullscreen.style.display = 'flex';
+    fullscreen.focus();
+    // Prevent scroll on body
+    document.body.style.overflow = 'hidden';
+  }
+
+  // === Close fullscreen ===
+  function closeFullscreen() {
+    appFrame.src = '';
+    fullscreen.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  fullscreenCloseBtn.addEventListener('click', closeFullscreen);
+  fullscreen.addEventListener('click', e => {
+    if (e.target === fullscreen) closeFullscreen();
+  });
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && fullscreen.style.display === 'flex') {
+      closeFullscreen();
+    }
+  });
+
+  // === Dark mode toggle ===
+  function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    document.body.classList.toggle('dark-mode', isDarkMode);
+    darkModeToggle.setAttribute('aria-pressed', isDarkMode);
+    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+  }
+  darkModeToggle.addEventListener('click', toggleDarkMode);
+
+  // Load dark mode state
+  (() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('darkMode'));
+      if (typeof saved === 'boolean') {
+        isDarkMode = saved;
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        darkModeToggle.setAttribute('aria-pressed', isDarkMode);
+      }
+    } catch {}
+  })();
+
+  // === Add App Form ===
+  function openAddForm() {
+    addForm.hidden = false;
+    appTitleInput.focus();
+  }
+  function closeAddForm() {
+    addForm.hidden = true;
+    appForm.reset();
+    previewContainer.innerHTML = '';
+  }
+  addAppBtn.addEventListener('click', openAddForm);
+  cancelAppBtn.addEventListener('click', closeAddForm);
+
+  // File upload handlers for icon and html
+  appIconUpload.addEventListener('change', () => {
+    const file = appIconUpload.files[0];
+    previewContainer.innerHTML = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+
+    const img = document.createElement('img');
+    img.alt = 'Icon preview';
+    img.title = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+      img.src = e.target.result;
+      previewContainer.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+  appHTMLUpload.addEventListener('change', () => {
+    const file = appHTMLUpload.files[0];
+    if (!file) return;
+    if (file.type !== 'text/html' && !file.name.endsWith('.html')) {
+      alert('Please upload a valid HTML file.');
+      appHTMLUpload.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      appHTMLInput.value = e.target.result;
+    };
+    reader.readAsText(file);
+  });
+
+  // Submit form
+  appForm.addEventListener('submit', e => {
+    e.preventDefault();
+    // Validation
+    const title = appTitleInput.value.trim();
+    const html = appHTMLInput.value.trim();
+    if (title.length < 2 || title.length > 50) {
+      alert('Title must be between 2 and 50 characters.');
+      appTitleInput.focus();
+      return;
+    }
+    if (!html) {
+      alert('Please provide HTML code.');
+      appHTMLInput.focus();
+      return;
+    }
+    // Generate id
+    const id = Date.now() + '-' + Math.floor(Math.random() * 10000);
+    // Read icon if uploaded
+    let iconData = '';
+    const iconFile = appIconUpload.files[0];
+    if (iconFile && iconFile.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        iconData = e.target.result;
+        finalizeAddApp(id, title, html, appCategoryInput.value.trim(), iconData);
+      };
+      reader.readAsDataURL(iconFile);
+    } else {
+      finalizeAddApp(id, title, html, appCategoryInput.value.trim(), '');
+    }
+  });
+
+  function finalizeAddApp(id, title, html, category, icon) {
+    apps.push({id, title, html, category, icon});
+    saveApps();
+    renderTabs();
+    renderApps();
+    closeAddForm();
+  }
+
+viewSourceBtn.addEventListener('click', () => {
+  const sources = apps.map(a => `--- ${a.title} ---\n${a.html}`).join('\n\n');
+
+  // You can keep the sources variable for any other purpose here, e.g., logging
+  console.log('Sources prepared:', sources);
+
+  // Open the external site in a new tab
+  const win = window.open('https://www.view-page-source.com/', '_blank');
+  if (!win) {
+    alert('Popup blocked, please allow popups.');
+    return;
+  }
+
+  // Optionally, you can send sources to this site if supported,
+  // but most likely, just opening the URL is enough.
+});
+
+
+  // Initial render
+  renderTabs();
+  renderApps();
+
+})();
+</script>
+
+</body>
+</html>
